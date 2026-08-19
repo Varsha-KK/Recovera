@@ -1,0 +1,13 @@
+<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="48" height="48" rx="12" fill="#0F766E"/>
+  <!-- Bell Handle -->
+  <path d="M24 7C22.3431 7 21 8.34315 21 10V11.1707C22.0128 11.0584 23.0135 11 24 11C24.9865 11 25.9872 11.0584 27 11.1707V10C27 8.34315 25.6569 7 24 7Z" fill="#CCFBF1"/>
+  <!-- Bell Body -->
+  <path d="M13 32C13 32 12 33.5 10 35C9 35.75 9.5 37 11 37H37C38.5 37 39 35.75 38 35C36 33.5 35 32 35 32V21C35 14.9249 30.0751 10 24 10C17.9249 10 13 14.9249 13 21V32Z" fill="#134E4A" stroke="#CCFBF1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Clapper -->
+  <path d="M21 38C21.2 40.2 22.4 42 24 42C25.6 42 26.8 40.2 27 38" stroke="#CCFBF1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- ECG Heartbeat Line -->
+  <path d="M6 25H16L18.5 21L21 28.5L24.5 14L28 32L30.5 25H42" stroke="#5EEAD4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Node Peak -->
+  <circle cx="24.5" cy="14" r="2" fill="#FFFFFF"/>
+</svg>

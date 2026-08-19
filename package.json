@@ -1,0 +1,36 @@
+{
+  "name": "recovera",
+  "version": "1.0.0",
+  "description": "Recovera — Intelligent Healthcare Post-Discharge Follow-Up Management Platform",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"blue,green\" \"npm run server:dev\" \"npm run client:dev\"",
+    "server:dev": "npm --prefix server run dev",
+    "client:dev": "npm --prefix client run dev",
+    "build": "npm --prefix server run build && npm --prefix client run build",
+    "client:build": "npm --prefix client run build",
+    "server:build": "npm --prefix server run build",
+    "start": "npm --prefix server run start",
+    "db:generate": "npm --prefix server run db:generate",
+    "db:push": "npm --prefix server run db:push",
+    "db:seed": "npm --prefix server run db:seed",
+    "create:admin": "npm --prefix server run create:admin",
+    "test:e2e": "npm --prefix server run test:e2e"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "healthcare",
+    "post-discharge",
+    "follow-up",
+    "care-drop-off",
+    "risk-stratification",
+    "twilio",
+    "elevenlabs",
+    "postgresql",
+    "prisma"
+  ],
+  "author": "Recovera Team",
+  "license": "MIT"
+}

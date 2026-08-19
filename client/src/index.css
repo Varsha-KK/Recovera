@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400;0,700;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+    --primary: 199 89% 48%;
+    --primary-foreground: 0 0% 100%;
+  }
+
+  * {
+    border-color: #E2E8F0;
+  }
+
+  html, body {
+    background-color: #F8FAFC;
+    color: #0F172A;
+    font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Headlines use Baskervville Bold */
+  h1, h2, h3, h4, h5, h6, .font-display, .font-headline {
+    font-family: "Baskervville", Georgia, serif;
+    font-weight: 700;
+    color: #0F172A;
+    letter-spacing: -0.01em;
+  }
+
+  /* Body & UI controls use Comic Sans MS */
+  p, span, a, button, input, textarea, select, label, table, td, th, div {
+    font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Clean surfaces */
+.clean-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+}
+
+.clean-card-hover {
+  transition: all 150ms ease;
+}
+
+.clean-card-hover:hover {
+  border-color: #CBD5E1;
+  box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.08);
+}
+
+/* Transitions */
+.btn-transition {
+  transition: all 150ms ease;
+}

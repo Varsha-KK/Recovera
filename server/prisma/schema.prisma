@@ -1,0 +1,317 @@
+// Prisma Schema for Recovera (PostgreSQL)
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  PATIENT
+  COORDINATOR
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  phone     String?
+  role      Role     @default(PATIENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patientProfile PatientProfile?
+
+  @@map("users")
+}
+
+model Hospital {
+  id         String   @id @default(uuid())
+  hospitalId String   @unique
+  name       String
+  address    String?
+  city       String?
+  state      String?
+  phone      String?
+  email      String?
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  patients  PatientProfile[]
+  carePlans CarePlan[]
+
+  @@map("hospitals")
+}
+
+model Disease {
+  id                         String   @id @default(uuid())
+  code                       String   @unique
+  name                       String
+  description                String?
+  defaultFollowUpWindowDays  Int      @default(14)
+  baselineSeverity           String   @default("MEDIUM")
+  preConsultationTests       Json?
+  guidelines                 String?
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+
+  carePlans CarePlan[]
+
+  @@map("diseases")
+}
+
+model PatientProfile {
+  id                  String   @id @default(uuid())
+  patientId           String   @unique
+  userId              String?  @unique
+  user                User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  hospitalId          String?
+  hospital            Hospital? @relation(fields: [hospitalId], references: [hospitalId], onDelete: SetNull)
+  name                String
+  age                 Int
+  gender              String
+  phone               String
+  email               String?
+  diagnosis           String
+  primaryDoctor       String
+  department          String
+  dischargeDate       DateTime
+  baselineSeverity    String   @default("MEDIUM")
+  riskScore           Int      @default(20)
+  riskLevel           String   @default("LOW")
+  reminderPreferences Json?
+  status              String   @default("ACTIVE")
+  notes               String?
+  vitals              Json?
+  medications         Json?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  carePlans           CarePlan[]
+  appointments        Appointment[]
+  reminderJobs        ReminderJob[]
+  riskAssessments     RiskAssessment[]
+  notifications       Notification[]
+  communicationLogs   CommunicationLog[]
+  callLogs            CallLog[]
+  medicationReminders MedicationReminder[]
+  testRequirements    TestRequirement[]
+
+  @@map("patient_profiles")
+}
+
+model CarePlan {
+  id                     String         @id @default(uuid())
+  carePlanId             String         @unique
+  patientId              String
+  patient                PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
+  hospitalId             String?
+  hospital               Hospital?      @relation(fields: [hospitalId], references: [hospitalId], onDelete: SetNull)
+  diseaseId              String?
+  disease                Disease?       @relation(fields: [diseaseId], references: [code], onDelete: SetNull)
+  diseaseName            String
+  severity               String
+  dischargeDate          DateTime
+  recommendedWindowStart DateTime
+  recommendedWindowEnd   DateTime
+  isActive               Boolean        @default(true)
+  notes                  String?
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  followUps        FollowUp[]
+  testRequirements TestRequirement[]
+
+  @@map("care_plans")
+}
+
+model FollowUp {
+  id          String    @id @default(uuid())
+  milestoneId String    @unique
+  carePlanId  String
+  carePlan    CarePlan  @relation(fields: [carePlanId], references: [carePlanId], onDelete: Cascade)
+  type        String
+  title       String
+  description String?
+  dueDate     DateTime
+  status      String    @default("PENDING")
+  completedAt DateTime?
+  channels    Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("follow_ups")
+}
+
+model Appointment {
+  id                 String         @id @default(uuid())
+  appointmentId      String         @unique
+  patientId          String
+  patient            PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
+  hospital           String
+  department         String
+  doctorName         String
+  type               String
+  scheduledDate      DateTime
+  scheduledTime      String
+  windowStart        DateTime?
+  windowEnd          DateTime?
+  status             String         @default("SCHEDULED")
+  isOverdue          Boolean        @default(false)
+  confirmedAt        DateTime?
+  cancellationReason String?
+  patientNotes       String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  history           AppointmentHistory[]
+  reminderJobs      ReminderJob[]
+  communicationLogs CommunicationLog[]
+  callLogs          CallLog[]
+
+  @@map("appointments")
+}
+
+model AppointmentHistory {
+  id              String      @id @default(uuid())
+  appointmentId   String
+  appointment     Appointment @relation(fields: [appointmentId], references: [appointmentId], onDelete: Cascade)
+  action          String
+  reason          String?
+  performedBy     String
+  performedByRole String
+  timestamp       DateTime    @default(now())
+  createdAt       DateTime    @default(now())
+
+  @@map("appointment_histories")
+}
+
+model ReminderJob {
+  id            String         @id @default(uuid())
+  jobId         String         @unique
+  appointmentId String
+  appointment   Appointment    @relation(fields: [appointmentId], references: [appointmentId], onDelete: Cascade)
+  patientId     String
+  patient       PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
+  channel       String
+  scheduledFor  DateTime
+  status        String         @default("PENDING")
+  payload       Json?
+  sentAt        DateTime?
+  error         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@map("reminder_jobs")
+}
+
+model RiskAssessment {
+  id                String         @id @default(uuid())
+  assessmentId      String         @unique
+  patientId         String
+  patient           PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
+  calculatedScore   Int
+  riskLevel         String
+  factors           Json
+  summary           String?
+  recommendedAction String?
+  timestamp         DateTime       @default(now())
+  createdAt         DateTime       @default(now())
+
+  @@map("risk_assessments")
+}
+
+model Notification {
+  id             String         @id @default(uuid())
+  notificationId String         @unique
+  patientId      String
+  patient        PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
+  title          String
+  message        String
+  type           String         @default("APPOINTMENT_REMINDER")
+  isRead         Boolean        @default(false)
+  link           String?
+  createdAt      DateTime       @default(now())
+
+  @@map("notifications")
+}
+
+model CommunicationLog {
+  id                String         @id @default(uuid())
+  logId             String         @unique
+  patientId         String
+  patient           PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
+  appointmentId     String?
+  appointment       Appointment?   @relation(fields: [appointmentId], references: [appointmentId], onDelete: SetNull)
+  channel           String
+  recipient         String
+  message           String
+  status            String
+  providerMessageId String?
+  metadata          Json?
+  timestamp         DateTime       @default(now())
+  createdAt         DateTime       @default(now())
+
+  @@map("communication_logs")
+}
+
+model CallLog {
+  id              String         @id @default(uuid())
+  callId          String         @unique
+  patientId       String
+  patient         PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
+  appointmentId   String?
+  appointment     Appointment?   @relation(fields: [appointmentId], references: [appointmentId], onDelete: SetNull)
+  phone           String
+  patientName     String
+  purpose         String
+  callSid         String?
+  status          String         @default("QUEUED")
+  durationSeconds Int            @default(0)
+  transcription   String?
+  audioUrl        String?
+  startedAt       DateTime?
+  endedAt         DateTime?
+  createdAt       DateTime       @default(now())
+
+  @@map("call_logs")
+}
+
+model MedicationReminder {
+  id             String         @id @default(uuid())
+  patientId      String
+  patient        PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
+  medicationName String
+  dosage         String
+  frequency      String
+  times          Json?
+  active         Boolean        @default(true)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@map("medication_reminders")
+}
+
+model TestRequirement {
+  id          String         @id @default(uuid())
+  patientId   String
+  patient     PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
+  carePlanId  String?
+  carePlan    CarePlan?      @relation(fields: [carePlanId], references: [carePlanId], onDelete: SetNull)
+  testName    String
+  description String?
+  dueDate     DateTime
+  status      String         @default("PENDING")
+  completedAt DateTime?
+  results     Json?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@map("test_requirements")
+}
