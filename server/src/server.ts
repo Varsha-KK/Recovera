@@ -24,7 +24,7 @@ import { EscalationService } from './services/escalationService.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
 
 const app = express();
-
+app.set('trust proxy', 1);
 // Security Middlewares
 app.use(
   helmet({
