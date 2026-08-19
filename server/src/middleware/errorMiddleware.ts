@@ -1,37 +1,64 @@
 import { Request, Response, NextFunction } from 'express';
 
 export const errorHandler = (
-  err: any,
+  err: unknown,
   req: Request,
   res: Response,
   next: NextFunction
 ): void => {
-  // Handle Malformed JSON parsing errors from express.json() / body-parser
-  if (
-    err instanceof SyntaxError &&
-    (err.status === 400 || err.statusCode === 400 || 'body' in err || err.type === 'entity.parse.failed')
-  ) {
-    res.status(400).json({
-      success: false,
-      message: 'Invalid JSON request body.',
-    });
-    return;
+  // Handle malformed JSON parsing errors from express.json() / body-parser
+  if (err instanceof SyntaxError) {
+    const parseError = err as SyntaxError & {
+      status?: number;
+      statusCode?: number;
+      type?: string;
+      body?: unknown;
+    };
+
+    if (
+      parseError.status === 400 ||
+      parseError.statusCode === 400 ||
+      'body' in parseError ||
+      parseError.type === 'entity.parse.failed'
+    ) {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid JSON request body.',
+      });
+      return;
+    }
   }
 
-  console.error('🔥 [Server Error]:', err.message || err);
+  const error = err as {
+    message?: string;
+    statusCode?: number;
+    status?: number;
+  };
 
-  const statusCode = err.statusCode || err.status || (res.statusCode === 200 ? 500 : res.statusCode);
+  console.error('🔥 [Server Error]:', error.message || err);
+
+  const statusCode =
+    error.statusCode ||
+    error.status ||
+    (res.statusCode === 200 ? 500 : res.statusCode);
+
   res.status(statusCode).json({
     success: false,
-    message: err.message || 'Internal Server Error',
+    message: error.message || 'Internal Server Error',
   });
 };
 
-export const notFoundHandler = (req: Request, res: Response): void => {
+export const notFoundHandler = (
+  req: Request,
+  res: Response
+): void => {
   res.status(404).json({
     success: false,
     message: `Resource not found: ${req.method} ${req.originalUrl}`,
   });
 };
 
-export default { errorHandler, notFoundHandler };
+export default {
+  errorHandler,
+  notFoundHandler,
+};

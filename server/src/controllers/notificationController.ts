@@ -153,7 +153,9 @@ export const serveTwiML = (req: Request, res: Response): void => {
   const audioId = req.params.audioId ? String(req.params.audioId) : undefined;
   const fallbackText = req.query.text as string | undefined;
 
-  const twiml = TwilioVoiceService.generateTwiML(audioId, fallbackText);
+  const twiml = TwilioVoiceService.generateTwiML(
+    fallbackText || audioId || 'Hello. This is Recovera.'
+  );
   res.type('text/xml');
   res.send(twiml);
 };

@@ -163,7 +163,7 @@ export class TwilioVoiceService {
           transcription: messageText,
           durationSeconds: 0,
         },
-      }).catch(() => {});
+      }).catch(() => { });
     }
 
     console.log('[Twilio Voice] Creating PSTN call', {
@@ -191,7 +191,7 @@ export class TwilioVoiceService {
             callSid: call.sid,
             status: call.status ? call.status.toUpperCase() : 'QUEUED',
           },
-        }).catch(() => {});
+        }).catch(() => { });
       }
 
       return {
@@ -200,6 +200,7 @@ export class TwilioVoiceService {
         to: normalizedRecipient,
         status: call.status,
         callId: callLogId,
+        appointmentId,
         message: messageText,
       };
     } catch (err: any) {
@@ -212,7 +213,7 @@ export class TwilioVoiceService {
           data: {
             status: 'FAILED',
           },
-        }).catch(() => {});
+        }).catch(() => { });
       }
 
       throw new Error(friendlyMessage);
