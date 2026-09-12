@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { AuthenticatedRequest } from '../middleware/authMiddleware.js';
 import { prisma } from '../config/prisma.js';
-import { TwilioSmsService } from '../services/twilioSmsService.js';
-import { TwilioVoiceService } from '../services/twilioVoiceService.js';
-import { ElevenLabsService, audioStore } from '../services/elevenLabsService.js';
+import { ExotelSmsService } from '../services/exotelSmsService.js';
+import { ExotelVoiceService } from '../services/exotelVoiceService.js';
+import { ElevenLabsService } from '../services/elevenLabsService.js';
 
 export const sendSms = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
@@ -14,7 +14,7 @@ export const sendSms = async (req: AuthenticatedRequest, res: Response): Promise
       return;
     }
 
-    const result = await TwilioSmsService.sendSMS({
+    const result = await ExotelSmsService.sendSMS({
       patientId,
       appointmentId,
       message,
@@ -24,7 +24,7 @@ export const sendSms = async (req: AuthenticatedRequest, res: Response): Promise
     res.status(200).json(result);
   } catch (error: any) {
     console.error('Send SMS error:', error.message);
-    res.status(400).json({ success: false, message: error.message || 'Failed to dispatch SMS.' });
+    res.status(400).json({ success: false, message: error.message || 'Failed to dispatch SMS via Exotel.' });
   }
 };
 
@@ -39,7 +39,7 @@ export const triggerVoiceCall = async (req: AuthenticatedRequest, res: Response)
 
     const textToSpeak = message || 'Hello. This is an automated follow-up reminder from Recovera regarding your upcoming clinical consultation. Please check your Recovera dashboard for details. Thank you.';
 
-    const result = await TwilioVoiceService.initiateOutboundCall({
+    const result = await ExotelVoiceService.initiateOutboundCall({
       patientId,
       appointmentId,
       phone,
@@ -51,7 +51,7 @@ export const triggerVoiceCall = async (req: AuthenticatedRequest, res: Response)
     res.status(200).json(result);
   } catch (error: any) {
     console.error('Trigger voice call error:', error.message);
-    res.status(400).json({ success: false, message: error.message || 'Failed to trigger voice call.' });
+    res.status(400).json({ success: false, message: error.message || 'Failed to trigger voice call via Exotel.' });
   }
 };
 
@@ -146,18 +146,13 @@ export const getCallLogs = async (req: AuthenticatedRequest, res: Response): Pro
 };
 
 // ============================================================
-// Public Voice Webhooks (Twilio Inbound Audio & Status)
+// Voice Webhooks & Audio Serving
 // ============================================================
 
 export const serveTwiML = (req: Request, res: Response): void => {
-  const audioId = req.params.audioId ? String(req.params.audioId) : undefined;
   const fallbackText = req.query.text as string | undefined;
-
-  const twiml = TwilioVoiceService.generateTwiML(
-    fallbackText || audioId || 'Hello. This is Recovera.'
-  );
   res.type('text/xml');
-  res.send(twiml);
+  res.send(`<?xml version="1.0" encoding="UTF-8"?>\n<Response>\n  <Say>${fallbackText || 'Hello. This is Recovera.'}</Say>\n</Response>`);
 };
 
 export const serveAudio = (req: Request, res: Response): void => {
@@ -180,10 +175,10 @@ export const serveAudio = (req: Request, res: Response): void => {
 export const handleVoiceStatusCallback = async (req: Request, res: Response): Promise<void> => {
   try {
     const callLogId = (req.query.callLogId as string) || '';
-    await TwilioVoiceService.handleStatusCallback(callLogId, req.body);
-    res.status(200).send('<Response></Response>');
+    await ExotelVoiceService.handleStatusCallback(callLogId, req.body);
+    res.status(200).json({ success: true });
   } catch (error) {
     console.error('Status callback error:', error);
-    res.status(200).send('<Response></Response>');
+    res.status(200).json({ success: false });
   }
 };

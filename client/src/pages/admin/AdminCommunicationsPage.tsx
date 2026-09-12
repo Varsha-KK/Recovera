@@ -56,7 +56,7 @@ export const AdminCommunicationsPage: React.FC = () => {
                 Outreach Logs & Call Records
               </h1>
               <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                Audit trail of Twilio 2-way SMS texts, automated Twilio Voice calls, and patient responses
+                Audit trail of Exotel SMS texts, automated Exotel Voice calls, and patient responses
               </p>
             </div>
 
@@ -175,7 +175,7 @@ export const AdminCommunicationsPage: React.FC = () => {
                         {call.durationSeconds}s
                       </td>
                       <td className="py-3.5 px-5 font-mono text-xs text-slate-400">
-                        {call.callSid || 'CA_twilio_sid'}
+                        {call.callSid || 'EXO_call_sid'}
                       </td>
                     </tr>
                   ))}

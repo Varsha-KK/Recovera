@@ -71,12 +71,12 @@ async function runEndToEndVerification() {
       headers: { Authorization: `Bearer ${adminToken}` },
     });
     console.log('   ✅ Integrations status retrieved:');
-    console.log('      - Twilio SMS Configured:', integrationsRes.data.data.twilioSms.configured);
-    console.log('      - Twilio Voice Configured:', integrationsRes.data.data.twilioVoice.configured);
+    console.log('      - Exotel SMS Configured:', integrationsRes.data.data.exotelSms?.configured ?? integrationsRes.data.data.twilioSms?.configured);
+    console.log('      - Exotel Voice Configured:', integrationsRes.data.data.exotelVoice?.configured ?? integrationsRes.data.data.twilioVoice?.configured);
     console.log('      - ElevenLabs Configured:', integrationsRes.data.data.elevenLabs.configured);
     console.log('      - ElevenLabs Key Masked:', integrationsRes.data.data.elevenLabs.maskedKey);
 
-    // 8. ElevenLabs Voice Synthesis & Twilio TwiML Serving
+    // 8. ElevenLabs Voice Synthesis & Audio Serving
     console.log('\n8️⃣ Testing Voice Synthesis & TwiML Webhooks...');
     const previewRes = await axios.post(
       `${BASE_URL}/notifications/voice/preview-audio`,

@@ -65,8 +65,8 @@ export const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-2 text-xs text-slate-400">
               <li>PostgreSQL + Prisma ORM</li>
-              <li>Twilio Programmable SMS</li>
-              <li>Twilio Voice Call Telephony</li>
+              <li>Exotel Programmable SMS</li>
+              <li>Exotel Voice Call Telephony</li>
               <li>ElevenLabs Voice AI Model</li>
               <li>VAPID Web Push Alerts</li>
               <li>Role-Based Access Control</li>

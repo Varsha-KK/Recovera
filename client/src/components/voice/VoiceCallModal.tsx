@@ -48,19 +48,19 @@ export const VoiceCallModal: React.FC<VoiceCallModalProps> = ({
         });
       } else {
         res = await notificationService.triggerTestCall({
-          recipientIndex: 1,
+          phone,
           message: messageText,
         });
       }
 
       const sid = res.callSid || res.data?.callSid;
       setCallSid(sid);
-      success(`Twilio outbound PSTN call dispatched (SID: ${sid})`, 'Call Initiated');
+      success(`Exotel outbound voice call dispatched (SID: ${sid})`, 'Call Initiated');
       if (onCallCompleted) onCallCompleted();
     } catch (err: any) {
-      const msg = err.response?.data?.message || err.message || 'Twilio call dispatch failed.';
+      const msg = err.response?.data?.message || err.message || 'Exotel call dispatch failed.';
       setErrorMsg(msg);
-      error(msg, 'Twilio Carrier Error');
+      error(msg, 'Exotel Call Error');
     } finally {
       setLoading(false);
     }
@@ -75,7 +75,7 @@ export const VoiceCallModal: React.FC<VoiceCallModalProps> = ({
         className="w-full max-w-md rounded-2xl bg-white text-slate-900 p-6 shadow-xl border border-slate-200 text-center relative overflow-hidden"
       >
         <div className="text-xs font-bold uppercase tracking-wider text-brand-700 mb-1 flex items-center justify-center gap-1.5">
-          <PhoneCall className="w-3.5 h-3.5 text-brand-600" /> Twilio PSTN Voice Outreach
+          <PhoneCall className="w-3.5 h-3.5 text-brand-600" /> Exotel Voice Outreach
         </div>
         <p className="text-xs text-slate-500 mb-4">{purpose}</p>
 
@@ -89,7 +89,7 @@ export const VoiceCallModal: React.FC<VoiceCallModalProps> = ({
         <h3 className="text-lg font-bold font-display text-slate-900 mb-0.5">{patientName}</h3>
         <p className="text-xs text-brand-700 font-mono font-bold mb-4">{phone}</p>
 
-        {/* Message Script to be spoken by Twilio */}
+        {/* Message Script to be spoken */}
         <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-left text-xs text-slate-700 leading-relaxed mb-4">
           <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
             Spoken Telephone Script Preview
@@ -102,13 +102,13 @@ export const VoiceCallModal: React.FC<VoiceCallModalProps> = ({
           <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs text-left mb-4">
             <div className="flex items-center gap-1.5 font-bold mb-1 text-emerald-800">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-              Twilio Call Dispatched
+              Exotel Call Dispatched
             </div>
             <div className="font-mono text-xs text-emerald-700 font-bold mb-1">
               Call SID: {callSid}
             </div>
             <p className="text-xs text-emerald-800 leading-normal">
-              Twilio is dialing the patient's physical phone. When answered, Twilio will speak the dynamic appointment message.
+              Exotel is dialing the patient's phone. When answered, Exotel will connect the call to the Recovera appointment flow.
             </p>
           </div>
         )}
@@ -117,7 +117,7 @@ export const VoiceCallModal: React.FC<VoiceCallModalProps> = ({
           <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-900 text-xs text-left mb-4">
             <div className="flex items-center gap-1.5 font-bold mb-1 text-red-800">
               <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
-              Twilio Dispatch Notice
+              Exotel Dispatch Notice
             </div>
             <p className="text-xs text-red-700 leading-normal">{errorMsg}</p>
           </div>

@@ -445,7 +445,7 @@ export const getAnalytics = async (_req: AuthenticatedRequest, res: Response): P
     ];
 
     const channelEffectiveness = [
-      { channel: 'Twilio SMS Text', total: 142, answeredRate: 96, confirmedActionRate: 78 },
+      { channel: 'Exotel SMS Text', total: 142, answeredRate: 96, confirmedActionRate: 78 },
       { channel: 'ElevenLabs Voice Call', total: 84, answeredRate: 88, confirmedActionRate: 82 },
       { channel: 'Web Push Notification', total: 110, answeredRate: 74, confirmedActionRate: 64 },
     ];

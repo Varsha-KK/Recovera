@@ -1,78 +1,65 @@
-// Prisma Schema for Recovera (PostgreSQL)
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
-enum Role {
-  ADMIN
-  PATIENT
-  COORDINATOR
-}
-
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String
-  phone     String?
-  role      Role     @default(PATIENT)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  id             String          @id @default(uuid())
+  email          String          @unique
+  password       String
+  name           String
+  phone          String?
+  role           Role            @default(PATIENT)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
   patientProfile PatientProfile?
 
   @@map("users")
 }
 
 model Hospital {
-  id         String   @id @default(uuid())
-  hospitalId String   @unique
+  id         String           @id @default(uuid())
+  hospitalId String           @unique
   name       String
   address    String?
   city       String?
   state      String?
   phone      String?
   email      String?
-  active     Boolean  @default(true)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  patients  PatientProfile[]
-  carePlans CarePlan[]
+  active     Boolean          @default(true)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  carePlans  CarePlan[]
+  patients   PatientProfile[]
 
   @@map("hospitals")
 }
 
 model Disease {
-  id                         String   @id @default(uuid())
-  code                       String   @unique
-  name                       String
-  description                String?
-  defaultFollowUpWindowDays  Int      @default(14)
-  baselineSeverity           String   @default("MEDIUM")
-  preConsultationTests       Json?
-  guidelines                 String?
-  createdAt                  DateTime @default(now())
-  updatedAt                  DateTime @updatedAt
-
-  carePlans CarePlan[]
+  id                        String     @id @default(uuid())
+  code                      String     @unique
+  name                      String
+  description               String?
+  defaultFollowUpWindowDays Int        @default(14)
+  baselineSeverity          String     @default("MEDIUM")
+  preConsultationTests      Json?
+  guidelines                String?
+  createdAt                 DateTime   @default(now())
+  updatedAt                 DateTime   @updatedAt
+  carePlans                 CarePlan[]
 
   @@map("diseases")
 }
 
 model PatientProfile {
-  id                  String   @id @default(uuid())
-  patientId           String   @unique
-  userId              String?  @unique
-  user                User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  id                  String               @id @default(uuid())
+  patientId           String               @unique
+  userId              String?              @unique
   hospitalId          String?
-  hospital            Hospital? @relation(fields: [hospitalId], references: [hospitalId], onDelete: SetNull)
   name                String
   age                 Int
   gender              String
@@ -82,51 +69,51 @@ model PatientProfile {
   primaryDoctor       String
   department          String
   dischargeDate       DateTime
-  baselineSeverity    String   @default("MEDIUM")
-  riskScore           Int      @default(20)
-  riskLevel           String   @default("LOW")
+  baselineSeverity    String               @default("MEDIUM")
+  riskScore           Int                  @default(20)
+  riskLevel           String               @default("LOW")
   reminderPreferences Json?
-  status              String   @default("ACTIVE")
+  status              String               @default("ACTIVE")
   notes               String?
   vitals              Json?
   medications         Json?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-
-  carePlans           CarePlan[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
   appointments        Appointment[]
+  callLogs            CallLog[]
+  carePlans           CarePlan[]
+  communicationLogs   CommunicationLog[]
+  medicationReminders MedicationReminder[]
+  notifications       Notification[]
+  hospital            Hospital?            @relation(fields: [hospitalId], references: [hospitalId])
+  user                User?                @relation(fields: [userId], references: [id])
   reminderJobs        ReminderJob[]
   riskAssessments     RiskAssessment[]
-  notifications       Notification[]
-  communicationLogs   CommunicationLog[]
-  callLogs            CallLog[]
-  medicationReminders MedicationReminder[]
   testRequirements    TestRequirement[]
 
   @@map("patient_profiles")
 }
 
 model CarePlan {
-  id                     String         @id @default(uuid())
-  carePlanId             String         @unique
+  id                     String            @id @default(uuid())
+  carePlanId             String            @unique
   patientId              String
-  patient                PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
   hospitalId             String?
-  hospital               Hospital?      @relation(fields: [hospitalId], references: [hospitalId], onDelete: SetNull)
   diseaseId              String?
-  disease                Disease?       @relation(fields: [diseaseId], references: [code], onDelete: SetNull)
   diseaseName            String
   severity               String
   dischargeDate          DateTime
   recommendedWindowStart DateTime
   recommendedWindowEnd   DateTime
-  isActive               Boolean        @default(true)
+  isActive               Boolean           @default(true)
   notes                  String?
-  createdAt              DateTime       @default(now())
-  updatedAt              DateTime       @updatedAt
-
-  followUps        FollowUp[]
-  testRequirements TestRequirement[]
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
+  disease                Disease?          @relation(fields: [diseaseId], references: [code])
+  hospital               Hospital?         @relation(fields: [hospitalId], references: [hospitalId])
+  patient                PatientProfile    @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
+  followUps              FollowUp[]
+  testRequirements       TestRequirement[]
 
   @@map("care_plans")
 }
@@ -135,7 +122,6 @@ model FollowUp {
   id          String    @id @default(uuid())
   milestoneId String    @unique
   carePlanId  String
-  carePlan    CarePlan  @relation(fields: [carePlanId], references: [carePlanId], onDelete: Cascade)
   type        String
   title       String
   description String?
@@ -145,15 +131,15 @@ model FollowUp {
   channels    Json?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  carePlan    CarePlan  @relation(fields: [carePlanId], references: [carePlanId], onDelete: Cascade)
 
   @@map("follow_ups")
 }
 
 model Appointment {
-  id                 String         @id @default(uuid())
-  appointmentId      String         @unique
+  id                 String               @id @default(uuid())
+  appointmentId      String               @unique
   patientId          String
-  patient            PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
   hospital           String
   department         String
   doctorName         String
@@ -162,18 +148,18 @@ model Appointment {
   scheduledTime      String
   windowStart        DateTime?
   windowEnd          DateTime?
-  status             String         @default("SCHEDULED")
-  isOverdue          Boolean        @default(false)
+  status             String               @default("SCHEDULED")
+  isOverdue          Boolean              @default(false)
   confirmedAt        DateTime?
   cancellationReason String?
   patientNotes       String?
-  createdAt          DateTime       @default(now())
-  updatedAt          DateTime       @updatedAt
-
-  history           AppointmentHistory[]
-  reminderJobs      ReminderJob[]
-  communicationLogs CommunicationLog[]
-  callLogs          CallLog[]
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  history            AppointmentHistory[]
+  patient            PatientProfile       @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
+  callLogs           CallLog[]
+  communicationLogs  CommunicationLog[]
+  reminderJobs       ReminderJob[]
 
   @@map("appointments")
 }
@@ -181,13 +167,13 @@ model Appointment {
 model AppointmentHistory {
   id              String      @id @default(uuid())
   appointmentId   String
-  appointment     Appointment @relation(fields: [appointmentId], references: [appointmentId], onDelete: Cascade)
   action          String
   reason          String?
   performedBy     String
   performedByRole String
   timestamp       DateTime    @default(now())
   createdAt       DateTime    @default(now())
+  appointment     Appointment @relation(fields: [appointmentId], references: [appointmentId], onDelete: Cascade)
 
   @@map("appointment_histories")
 }
@@ -196,9 +182,7 @@ model ReminderJob {
   id            String         @id @default(uuid())
   jobId         String         @unique
   appointmentId String
-  appointment   Appointment    @relation(fields: [appointmentId], references: [appointmentId], onDelete: Cascade)
   patientId     String
-  patient       PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
   channel       String
   scheduledFor  DateTime
   status        String         @default("PENDING")
@@ -207,6 +191,8 @@ model ReminderJob {
   error         String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+  appointment   Appointment    @relation(fields: [appointmentId], references: [appointmentId], onDelete: Cascade)
+  patient       PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
 
   @@map("reminder_jobs")
 }
@@ -215,7 +201,6 @@ model RiskAssessment {
   id                String         @id @default(uuid())
   assessmentId      String         @unique
   patientId         String
-  patient           PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
   calculatedScore   Int
   riskLevel         String
   factors           Json
@@ -223,6 +208,7 @@ model RiskAssessment {
   recommendedAction String?
   timestamp         DateTime       @default(now())
   createdAt         DateTime       @default(now())
+  patient           PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
 
   @@map("risk_assessments")
 }
@@ -231,13 +217,13 @@ model Notification {
   id             String         @id @default(uuid())
   notificationId String         @unique
   patientId      String
-  patient        PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
   title          String
   message        String
   type           String         @default("APPOINTMENT_REMINDER")
   isRead         Boolean        @default(false)
   link           String?
   createdAt      DateTime       @default(now())
+  patient        PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
 
   @@map("notifications")
 }
@@ -246,9 +232,7 @@ model CommunicationLog {
   id                String         @id @default(uuid())
   logId             String         @unique
   patientId         String
-  patient           PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
   appointmentId     String?
-  appointment       Appointment?   @relation(fields: [appointmentId], references: [appointmentId], onDelete: SetNull)
   channel           String
   recipient         String
   message           String
@@ -257,6 +241,8 @@ model CommunicationLog {
   metadata          Json?
   timestamp         DateTime       @default(now())
   createdAt         DateTime       @default(now())
+  appointment       Appointment?   @relation(fields: [appointmentId], references: [appointmentId])
+  patient           PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
 
   @@map("communication_logs")
 }
@@ -265,9 +251,7 @@ model CallLog {
   id              String         @id @default(uuid())
   callId          String         @unique
   patientId       String
-  patient         PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
   appointmentId   String?
-  appointment     Appointment?   @relation(fields: [appointmentId], references: [appointmentId], onDelete: SetNull)
   phone           String
   patientName     String
   purpose         String
@@ -279,6 +263,8 @@ model CallLog {
   startedAt       DateTime?
   endedAt         DateTime?
   createdAt       DateTime       @default(now())
+  appointment     Appointment?   @relation(fields: [appointmentId], references: [appointmentId])
+  patient         PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
 
   @@map("call_logs")
 }
@@ -286,7 +272,6 @@ model CallLog {
 model MedicationReminder {
   id             String         @id @default(uuid())
   patientId      String
-  patient        PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
   medicationName String
   dosage         String
   frequency      String
@@ -294,6 +279,7 @@ model MedicationReminder {
   active         Boolean        @default(true)
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
+  patient        PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
 
   @@map("medication_reminders")
 }
@@ -301,9 +287,7 @@ model MedicationReminder {
 model TestRequirement {
   id          String         @id @default(uuid())
   patientId   String
-  patient     PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
   carePlanId  String?
-  carePlan    CarePlan?      @relation(fields: [carePlanId], references: [carePlanId], onDelete: SetNull)
   testName    String
   description String?
   dueDate     DateTime
@@ -312,6 +296,14 @@ model TestRequirement {
   results     Json?
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
+  carePlan    CarePlan?      @relation(fields: [carePlanId], references: [carePlanId])
+  patient     PatientProfile @relation(fields: [patientId], references: [patientId], onDelete: Cascade)
 
   @@map("test_requirements")
+}
+
+enum Role {
+  ADMIN
+  PATIENT
+  COORDINATOR
 }

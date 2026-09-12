@@ -57,7 +57,7 @@ export const MetricCards: React.FC<MetricCardsProps> = ({ metrics }) => {
       title: 'Outreach Contact Rate',
       value: metrics.commSuccessRate,
       suffix: '%',
-      sublabel: 'SMS & Twilio Voice',
+      sublabel: 'SMS & Exotel Voice',
       icon: PhoneCall,
       color: 'text-emerald-700 bg-emerald-50 border-emerald-200',
     },

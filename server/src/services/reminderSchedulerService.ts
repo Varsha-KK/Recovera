@@ -1,6 +1,6 @@
 import { prisma } from '../config/prisma.js';
-import { TwilioSmsService } from './twilioSmsService.js';
-import { TwilioVoiceService } from './twilioVoiceService.js';
+import { ExotelSmsService } from './exotelSmsService.js';
+import { ExotelVoiceService } from './exotelVoiceService.js';
 import { WebPushService } from './webPushService.js';
 
 export class ReminderSchedulerService {
@@ -91,7 +91,7 @@ export class ReminderSchedulerService {
   }
 
   /**
-   * Dispatches due reminder jobs across Twilio SMS, Voice, and Web Push
+   * Dispatches due reminder jobs across Exotel SMS, Voice, and Web Push
    */
   static async processDueReminders() {
     const now = new Date();
@@ -114,14 +114,14 @@ export class ReminderSchedulerService {
 
       try {
         if (job.channel === 'SMS') {
-          await TwilioSmsService.sendSMS({
+          await ExotelSmsService.sendSMS({
             patientId: job.patientId,
             appointmentId: job.appointmentId,
             message,
             recipient: job.patient.phone,
           });
         } else if (job.channel === 'VOICE') {
-          await TwilioVoiceService.initiateOutboundCall({
+          await ExotelVoiceService.initiateOutboundCall({
             patientId: job.patientId,
             appointmentId: job.appointmentId,
             phone: job.patient.phone,

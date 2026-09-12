@@ -6,7 +6,6 @@ import cron from 'node-cron';
 
 import { ENV } from './config/env.js';
 import { prisma } from './config/prisma.js';
-import { getTestRecipientsCount } from './services/twilioTestRecipients.js';
 
 // Route Imports
 import authRoutes from './routes/authRoutes.js';
@@ -90,7 +89,7 @@ app.use('/api/patient', patientRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/notifications', notificationRoutes);
-app.use('/api/voice', notificationRoutes); // Alias for Twilio voice webhooks (/api/voice/twiml, /api/voice/audio, /api/voice/status-callback)
+app.use('/api/voice', notificationRoutes); // Alias for voice endpoints
 app.use('/api/followups', followupRoutes);
 app.use('/api/risk', riskRoutes);
 app.use('/api/integrations', integrationRoutes);
@@ -123,15 +122,16 @@ const startServer = async () => {
       console.log('Recovera Server');
       console.log('======================================================');
       console.log('[Database] PostgreSQL: CONNECTED\n');
-      console.log('[Twilio]');
-      console.log(`Account SID: ${ENV.TWILIO_ACCOUNT_SID ? 'SET' : 'MISSING'}`);
-      console.log(`API Key SID: ${ENV.TWILIO_API_KEY_SID ? 'SET' : 'MISSING'}`);
-      console.log(`API Key Secret: ${ENV.TWILIO_API_KEY_SECRET ? 'SET' : 'MISSING'}`);
-      console.log(`Phone Number: ${ENV.TWILIO_PHONE_NUMBER ? 'SET' : 'MISSING'}`);
+      console.log('[Exotel]');
+      console.log(`Account SID: ${ENV.EXOTEL_ACCOUNT_SID}`);
+      console.log(`Subdomain: ${ENV.EXOTEL_SUBDOMAIN}`);
+      console.log(`API Key: ${ENV.EXOTEL_API_KEY ? 'SET' : 'MISSING'}`);
+      console.log(`API Token: ${ENV.EXOTEL_API_TOKEN ? 'SET' : 'MISSING'}`);
+      console.log(`SMS Sender ID: ${ENV.EXOTEL_SMS_SENDER_ID || 'NOT CONFIGURED'}`);
+      console.log(`Voice ExoPhone: ${ENV.EXOTEL_VOICE_EXOPHONE || 'NOT CONFIGURED'}`);
+      console.log(`Voice App ID: ${ENV.EXOTEL_VOICE_APP_ID}`);
       console.log(`SMS: ${ENV.SMS_ENABLED ? 'ENABLED' : 'DISABLED'}`);
       console.log(`Voice: ${ENV.VOICE_CALL_ENABLED ? 'ENABLED' : 'DISABLED'}`);
-      console.log(`Public Base URL: ${ENV.TWILIO_PUBLIC_BASE_URL || 'NOT CONFIGURED'}`);
-      console.log(`Test Recipients: ${getTestRecipientsCount()}`);
       console.log('======================================================\n');
       startBackgroundJobs();
     });

@@ -39,6 +39,14 @@ export const AdminIntegrationsPage: React.FC = () => {
     fetchStatus();
   }, []);
 
+  const isSmsConfigured = Boolean(status?.exotelSms?.configured || status?.twilioSms?.configured);
+  const smsAccountSid = status?.exotelSms?.accountSid || status?.twilioSms?.accountSid || 'Not provided';
+  const smsSenderId = status?.exotelSms?.senderId || status?.twilioSms?.phoneNumber || 'Not provided';
+
+  const isVoiceConfigured = Boolean(status?.exotelVoice?.configured || status?.twilioVoice?.configured);
+  const voiceExoPhone = status?.exotelVoice?.exoPhone || status?.twilioVoice?.phoneNumber || 'Not provided';
+  const voiceAppId = status?.exotelVoice?.appId || '1338862';
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
       <Navbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
@@ -57,7 +65,7 @@ export const AdminIntegrationsPage: React.FC = () => {
                 Outreach & Communication Integrations
               </h1>
               <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                Verified connection status of Twilio SMS, Twilio Voice, ElevenLabs AI, and Web Push services
+                Verified connection status of Exotel SMS, Exotel Voice, ElevenLabs AI, and Web Push services
               </p>
             </div>
 
@@ -75,7 +83,7 @@ export const AdminIntegrationsPage: React.FC = () => {
             <LoadingSpinner label="Validating API credentials and provider health..." />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Twilio SMS */}
+              {/* Exotel SMS */}
               <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-4">
@@ -84,19 +92,19 @@ export const AdminIntegrationsPage: React.FC = () => {
                         <MessageSquare className="w-6 h-6" />
                       </div>
                       <div>
-                        <h3 className="text-base font-bold font-display text-slate-900">Twilio SMS</h3>
-                        <p className="text-xs text-slate-500">2-Way Clinical Text Messaging</p>
+                        <h3 className="text-base font-bold font-display text-slate-900">Exotel SMS</h3>
+                        <p className="text-xs text-slate-500">Clinical SMS Text Messaging</p>
                       </div>
                     </div>
 
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 border ${
-                        status?.twilioSms.configured
+                        isSmsConfigured
                           ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                           : 'bg-amber-50 text-amber-700 border-amber-200'
                       }`}
                     >
-                      {status?.twilioSms.configured ? (
+                      {isSmsConfigured ? (
                         <>
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Connected
                         </>
@@ -109,27 +117,27 @@ export const AdminIntegrationsPage: React.FC = () => {
                   </div>
 
                   <p className="text-xs text-slate-600 leading-relaxed mb-4">
-                    Dispatches automated reminder texts, appointment check-ins, and dynamic notifications.
+                    Dispatches automated reminder texts, appointment check-ins, and dynamic notifications via Exotel.
                   </p>
 
                   <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1.5 font-mono">
                     <div className="flex justify-between">
                       <span className="text-slate-400">Account SID:</span>
-                      <span className="text-slate-800 font-bold">{status?.twilioSms.accountSid || 'Not provided'}</span>
+                      <span className="text-slate-800 font-bold">{smsAccountSid}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-400">Outbound Number:</span>
-                      <span className="text-slate-800 font-bold">{status?.twilioSms.phoneNumber || 'Not provided'}</span>
+                      <span className="text-slate-400">Sender ID / Header:</span>
+                      <span className="text-slate-800 font-bold">{smsSenderId}</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="pt-4 border-t border-slate-100 mt-4 text-xs text-slate-400">
-                  Configure via <code className="text-slate-600 font-mono">TWILIO_ACCOUNT_SID</code>, <code className="text-slate-600 font-mono">TWILIO_API_KEY_SID</code>
+                  Configure via <code className="text-slate-600 font-mono">EXOTEL_ACCOUNT_SID</code>, <code className="text-slate-600 font-mono">EXOTEL_SMS_SENDER_ID</code>
                 </div>
               </div>
 
-              {/* Twilio Voice */}
+              {/* Exotel Voice */}
               <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-4">
@@ -138,19 +146,19 @@ export const AdminIntegrationsPage: React.FC = () => {
                         <PhoneCall className="w-6 h-6" />
                       </div>
                       <div>
-                        <h3 className="text-base font-bold font-display text-slate-900">Twilio Voice (PSTN)</h3>
+                        <h3 className="text-base font-bold font-display text-slate-900">Exotel Voice</h3>
                         <p className="text-xs text-slate-500">Automated Follow-Up Voice Dispatcher</p>
                       </div>
                     </div>
 
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 border ${
-                        status?.twilioVoice.configured
+                        isVoiceConfigured
                           ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                           : 'bg-amber-50 text-amber-700 border-amber-200'
                       }`}
                     >
-                      {status?.twilioVoice.configured ? (
+                      {isVoiceConfigured ? (
                         <>
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Connected
                         </>
@@ -163,23 +171,23 @@ export const AdminIntegrationsPage: React.FC = () => {
                   </div>
 
                   <p className="text-xs text-slate-600 leading-relaxed mb-4">
-                    Dials outbound PSTN calls to physical patient phones, speaking dynamic appointment dates, times, and care details.
+                    Dials outbound calls to patient phones, connecting patients to the configured Recovera voice flow.
                   </p>
 
                   <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1.5 font-mono">
                     <div className="flex justify-between">
-                      <span className="text-slate-400">Caller ID:</span>
-                      <span className="text-slate-800 font-bold">{status?.twilioVoice.phoneNumber || 'Not provided'}</span>
+                      <span className="text-slate-400">Caller ID (ExoPhone):</span>
+                      <span className="text-slate-800 font-bold">{voiceExoPhone}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-400">TwiML Webhook:</span>
-                      <span className="text-slate-800 font-bold">Active (/api/integrations/twilio/simple-twiml)</span>
+                      <span className="text-slate-400">Voice App ID:</span>
+                      <span className="text-slate-800 font-bold">{voiceAppId}</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="pt-4 border-t border-slate-100 mt-4 text-xs text-slate-400">
-                  Configure via <code className="text-slate-600 font-mono">VOICE_CALL_ENABLED=true</code>
+                  Configure via <code className="text-slate-600 font-mono">EXOTEL_VOICE_EXOPHONE</code>, <code className="text-slate-600 font-mono">EXOTEL_VOICE_APP_ID</code>
                 </div>
               </div>
 

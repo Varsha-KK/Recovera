@@ -45,7 +45,7 @@ export const JourneyExplorer: React.FC = () => {
       title: '72h Multi-Channel Outreach',
       summary: 'Automated 2-way SMS check-in verifies prescription fill and reminds patient of upcoming consultation slot.',
       patientView: 'SMS reminder delivered with 1-click confirmation link.',
-      hospitalView: 'SMS delivered via Twilio. Status: DELIVERED. Attendance unconfirmed.',
+      hospitalView: 'SMS delivered via Exotel. Status: DELIVERED. Attendance unconfirmed.',
       icon: CalendarClock,
       status: 'IN_PROGRESS',
     },

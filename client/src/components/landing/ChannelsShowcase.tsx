@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageSquare, PhoneCall, Bell, Sparkles, CheckCircle2, Play, Pause, Volume2 } from 'lucide-react';
+import { MessageSquare, PhoneCall, Bell, Sparkles, Volume2 } from 'lucide-react';
 import { AudioPreviewPlayer } from '../voice/AudioPreviewPlayer';
 
 export const ChannelsShowcase: React.FC = () => {
@@ -17,7 +17,7 @@ export const ChannelsShowcase: React.FC = () => {
             Meet patients wherever they are
           </h2>
           <p className="text-base text-slate-600">
-            Intelligent escalation across Twilio SMS, automated ElevenLabs Voice calls, and Web Push notifications
+            Intelligent escalation across Exotel SMS, automated ElevenLabs Voice calls, and Web Push notifications
           </p>
         </div>
 
@@ -44,7 +44,7 @@ export const ChannelsShowcase: React.FC = () => {
               }`}
             >
               <MessageSquare className="w-4 h-4 text-brand-600" />
-              Twilio SMS Text
+              Exotel SMS Text
             </button>
             <button
               onClick={() => setActiveTab('PUSH')}
@@ -75,7 +75,7 @@ export const ChannelsShowcase: React.FC = () => {
                   </div>
                 </div>
                 <span className="px-3 py-1 rounded-full text-xs font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">
-                  ElevenLabs + Twilio Voice
+                  ElevenLabs + Exotel Voice
                 </span>
               </div>
 
@@ -94,12 +94,12 @@ export const ChannelsShowcase: React.FC = () => {
                     <MessageSquare className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-white">Twilio 2-Way SMS</h3>
+                    <h3 className="text-base font-bold text-white">Exotel SMS Outreach</h3>
                     <p className="text-xs text-slate-400">Automated check-ins with 1-click confirmation links</p>
                   </div>
                 </div>
                 <span className="px-3 py-1 rounded-full text-xs font-bold bg-brand-500/20 text-brand-300 border border-brand-500/30">
-                  Twilio SMS
+                  Exotel SMS
                 </span>
               </div>
 
@@ -155,3 +155,5 @@ export const ChannelsShowcase: React.FC = () => {
     </section>
   );
 };
+
+export default ChannelsShowcase;

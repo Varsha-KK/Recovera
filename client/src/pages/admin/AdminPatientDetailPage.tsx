@@ -168,7 +168,7 @@ export const AdminPatientDetailPage: React.FC = () => {
                 onClick={() => setCallModalOpen(true)}
                 leftIcon={<PhoneCall className="w-4 h-4 text-white" />}
               >
-                Call Patient (Twilio Voice)
+                Call Patient (Exotel Voice)
               </Button>
             </div>
           </div>

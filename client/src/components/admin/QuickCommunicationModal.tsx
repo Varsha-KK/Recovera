@@ -123,7 +123,7 @@ export const QuickCommunicationModal: React.FC<QuickCommunicationModalProps> = (
             }`}
           >
             <MessageSquare className="w-3.5 h-3.5" />
-            Twilio SMS Text
+            Exotel SMS Text
           </button>
           <button
             type="button"
@@ -135,7 +135,7 @@ export const QuickCommunicationModal: React.FC<QuickCommunicationModalProps> = (
             }`}
           >
             <PhoneCall className="w-3.5 h-3.5" />
-            Twilio Voice Call
+            Exotel Voice Call
           </button>
         </div>
 

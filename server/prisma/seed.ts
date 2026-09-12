@@ -800,7 +800,7 @@ export async function main() {
         message: `Recovera Follow-Up: Hello ${pDef.name}, your checkup is scheduled for ${formatDateOnly(apptDate)} at ${pDef.apptTime}. Please log in to confirm.`,
         status: 'DELIVERED',
         providerMessageId: `SM_${pDef.patientId}_seed`,
-        metadata: { provider: 'Twilio' },
+        metadata: { provider: 'Exotel' },
         timestamp: addDays(dischargeDate, 2),
       },
     });

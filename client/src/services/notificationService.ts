@@ -12,8 +12,8 @@ export const notificationService = {
     return response.data;
   },
 
-  triggerTestCall: async (data: { recipientIndex?: number; message?: string }) => {
-    const response = await api.post('/integrations/twilio/test-call', data);
+  triggerTestCall: async (data: { phone?: string; message?: string }) => {
+    const response = await api.post('/integrations/exotel/test-call', data);
     return response.data;
   },
 

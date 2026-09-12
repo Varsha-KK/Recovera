@@ -31,7 +31,7 @@ export const CorePillarsSection: React.FC = () => {
       num: '03',
       title: 'Remind',
       headline: 'Multi-Channel Engagement',
-      desc: 'Automated 2-way SMS check-ins, natural voice calls (via ElevenLabs + Twilio), and browser push alerts keep patients informed without spam.',
+      desc: 'Automated SMS check-ins, natural voice calls (via ElevenLabs + Exotel), and browser push alerts keep patients informed without spam.',
       icon: BellRing,
       color: 'bg-indigo-50 text-indigo-700 border-indigo-200',
     },

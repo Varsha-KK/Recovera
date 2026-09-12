@@ -1,6 +1,7 @@
 import { Router } from 'express';
+import { exotelVoiceGreeting } from '../controllers/exotelVoiceController.js';
 import {
-  getTwilioStatus,
+  getExotelStatus,
   sendTestSms,
   sendTestCall,
   getSimpleTwiml,
@@ -8,14 +9,21 @@ import {
 
 const router = Router();
 
-// Twilio Diagnostic Status
-router.get('/twilio/status', getTwilioStatus);
+// Exotel Diagnostic Status
+router.get('/exotel/status', getExotelStatus);
+router.get('/exotel/voice-greeting', exotelVoiceGreeting);
+router.get('/twilio/status', getExotelStatus); // Compatibility alias
 
-// Twilio Simple TwiML Endpoint (Supports both GET and POST webhooks from Twilio)
+// Audio / TwiML Endpoint
 router.all('/twilio/simple-twiml', getSimpleTwiml);
 
-// Twilio Safe Test Endpoints (Development / Testing)
+// Test Endpoints
+router.post('/exotel/test-sms', sendTestSms);
+
+router.post('/exotel/test-call', sendTestCall);
+
 router.post('/twilio/test-sms', sendTestSms);
+
 router.post('/twilio/test-call', sendTestCall);
 
 export default router;

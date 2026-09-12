@@ -207,13 +207,29 @@ export interface NotificationData {
 }
 
 export interface IntegrationStatus {
-  twilioSms: {
+  exotelSms: {
+    configured: boolean;
+    enabled: boolean;
+    senderId: string | null;
+    accountSid: string | null;
+    subdomain?: string;
+    dltConfigured?: boolean;
+  };
+  exotelVoice: {
+    configured: boolean;
+    enabled: boolean;
+    exoPhone: string | null;
+    accountSid: string | null;
+    subdomain?: string;
+    appId?: string;
+  };
+  twilioSms?: {
     configured: boolean;
     enabled: boolean;
     phoneNumber: string | null;
     accountSid: string | null;
   };
-  twilioVoice: {
+  twilioVoice?: {
     configured: boolean;
     enabled: boolean;
     phoneNumber: string | null;

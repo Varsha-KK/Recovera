@@ -19,18 +19,23 @@ export const ENV = {
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
   DEV_ADMIN_PASSWORD: process.env.DEV_ADMIN_PASSWORD || 'RecoveraAdmin2026!',
 
-  // Twilio Configuration
-  TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID || '',
-  TWILIO_API_KEY_SID: process.env.TWILIO_API_KEY_SID || '',
-  TWILIO_API_KEY_SECRET: process.env.TWILIO_API_KEY_SECRET || '',
-  TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER || '',
-  TWILIO_PUBLIC_BASE_URL: process.env.TWILIO_PUBLIC_BASE_URL || process.env.TWILIO_TWIML_URL || '',
-  TWILIO_TWIML_URL: process.env.TWILIO_TWIML_URL || '',
+  // Exotel Configuration (SMS & Voice Calls)
+  EXOTEL_ACCOUNT_SID: process.env.EXOTEL_ACCOUNT_SID || 'recovera1',
+  EXOTEL_SUBDOMAIN: process.env.EXOTEL_SUBDOMAIN || 'api.exotel.com',
+  EXOTEL_API_KEY: process.env.EXOTEL_API_KEY || '',
+  EXOTEL_API_TOKEN: process.env.EXOTEL_API_TOKEN || '',
+  EXOTEL_VOICE_APP_ID: process.env.EXOTEL_VOICE_APP_ID || '1338862',
+  EXOTEL_VOICE_GREETING_URL:
+    process.env.EXOTEL_VOICE_GREETING_URL || '',
 
-  // Twilio Test Recipient Allowlist
-  TWILIO_TEST_NUMBER_1: process.env.TWILIO_TEST_NUMBER_1 || '',
-  TWILIO_TEST_NUMBER_2: process.env.TWILIO_TEST_NUMBER_2 || '',
-  TWILIO_TEST_NUMBER_3: process.env.TWILIO_TEST_NUMBER_3 || '',
+
+  // Exotel SMS Sender & Voice ExoPhone
+  EXOTEL_SMS_SENDER_ID: process.env.EXOTEL_SMS_SENDER_ID || '',
+  EXOTEL_VOICE_EXOPHONE: process.env.EXOTEL_VOICE_EXOPHONE || '',
+
+  // Optional TRAI / India DLT Configuration
+  EXOTEL_DLT_ENTITY_ID: process.env.EXOTEL_DLT_ENTITY_ID || '',
+  EXOTEL_DLT_TEMPLATE_ID: process.env.EXOTEL_DLT_TEMPLATE_ID || '',
 
   // ElevenLabs Voice Configuration
   ELEVENLABS_API_KEY: process.env.ELEVENLABS_API_KEY || '',
@@ -43,9 +48,8 @@ export const ENV = {
 
   // Feature Flags
   SMS_ENABLED:
-    process.env.TWILIO_SMS_ENABLED === 'true' ||
     process.env.SMS_ENABLED === 'true' ||
-    (process.env.TWILIO_SMS_ENABLED !== 'false' && process.env.SMS_ENABLED !== 'false'),
+    (process.env.SMS_ENABLED !== 'false'),
   VOICE_CALL_ENABLED:
     process.env.VOICE_CALL_ENABLED === 'true' || process.env.VOICE_CALL_ENABLED !== 'false',
   WEB_PUSH_ENABLED:
@@ -54,12 +58,10 @@ export const ENV = {
 
 // Check service configuration statuses
 export const getServiceStatus = () => {
-  const isTwilioConfigured = Boolean(
-    ENV.TWILIO_ACCOUNT_SID &&
-    ENV.TWILIO_API_KEY_SID &&
-    ENV.TWILIO_API_KEY_SECRET &&
-    ENV.TWILIO_PHONE_NUMBER &&
-    !ENV.TWILIO_ACCOUNT_SID.startsWith('AC000000')
+  const isExotelConfigured = Boolean(
+    ENV.EXOTEL_ACCOUNT_SID &&
+    ENV.EXOTEL_API_KEY &&
+    ENV.EXOTEL_API_TOKEN
   );
 
   const isElevenLabsConfigured = Boolean(
@@ -72,29 +74,35 @@ export const getServiceStatus = () => {
     ENV.VAPID_PRIVATE_KEY
   );
 
-  // Count configured test numbers
-  const testRecipientsCount = [
-    ENV.TWILIO_TEST_NUMBER_1,
-    ENV.TWILIO_TEST_NUMBER_2,
-    ENV.TWILIO_TEST_NUMBER_3,
-  ].filter((n) => Boolean(n && n.trim())).length;
+  const exotelSmsStatus = {
+    configured: isExotelConfigured && Boolean(ENV.EXOTEL_SMS_SENDER_ID) && ENV.SMS_ENABLED,
+    enabled: ENV.SMS_ENABLED,
+    accountSid: isExotelConfigured ? `${ENV.EXOTEL_ACCOUNT_SID.slice(0, 4)}••••` : null,
+    subdomain: ENV.EXOTEL_SUBDOMAIN,
+    senderId: ENV.EXOTEL_SMS_SENDER_ID || null,
+    dltConfigured: Boolean(ENV.EXOTEL_DLT_ENTITY_ID),
+  };
+
+  const exotelVoiceStatus = {
+    configured: isExotelConfigured && Boolean(ENV.EXOTEL_VOICE_EXOPHONE) && ENV.VOICE_CALL_ENABLED,
+    enabled: ENV.VOICE_CALL_ENABLED,
+    accountSid: isExotelConfigured ? `${ENV.EXOTEL_ACCOUNT_SID.slice(0, 4)}••••` : null,
+    subdomain: ENV.EXOTEL_SUBDOMAIN,
+    exoPhone: ENV.EXOTEL_VOICE_EXOPHONE ? `•••${ENV.EXOTEL_VOICE_EXOPHONE.slice(-4)}` : null,
+    appId: ENV.EXOTEL_VOICE_APP_ID,
+  };
 
   return {
+    exotelSms: exotelSmsStatus,
+    exotelVoice: exotelVoiceStatus,
+    // Aliases to ensure backward compatibility with existing consumers
     twilioSms: {
-      configured: isTwilioConfigured && ENV.SMS_ENABLED,
-      enabled: ENV.SMS_ENABLED,
-      accountSid: isTwilioConfigured ? `${ENV.TWILIO_ACCOUNT_SID.slice(0, 4)}••••••••` : null,
-      apiKeySid: isTwilioConfigured ? `${ENV.TWILIO_API_KEY_SID.slice(0, 4)}••••••••` : null,
-      phoneNumber: isTwilioConfigured && ENV.TWILIO_PHONE_NUMBER ? `+1•••${ENV.TWILIO_PHONE_NUMBER.slice(-4)}` : null,
-      testRecipientsConfigured: testRecipientsCount,
+      ...exotelSmsStatus,
+      phoneNumber: exotelSmsStatus.senderId,
     },
     twilioVoice: {
-      configured: isTwilioConfigured && ENV.VOICE_CALL_ENABLED,
-      enabled: ENV.VOICE_CALL_ENABLED,
-      accountSid: isTwilioConfigured ? `${ENV.TWILIO_ACCOUNT_SID.slice(0, 4)}••••••••` : null,
-      apiKeySid: isTwilioConfigured ? `${ENV.TWILIO_API_KEY_SID.slice(0, 4)}••••••••` : null,
-      phoneNumber: isTwilioConfigured && ENV.TWILIO_PHONE_NUMBER ? `+1•••${ENV.TWILIO_PHONE_NUMBER.slice(-4)}` : null,
-      testRecipientsConfigured: testRecipientsCount,
+      ...exotelVoiceStatus,
+      phoneNumber: exotelVoiceStatus.exoPhone,
     },
     elevenLabs: {
       configured: isElevenLabsConfigured,
